@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "KWin/Effect",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "i@sww.moe",
+                "Name": "swwind"
+            }
+        ],
+        "Category": "Accessibility",
+        "Description": "Blue Archive style click animation.",
+        "EnabledByDefault": true,
+        "Icon": "preferences-desktop-mouse",
+        "License": "GPL",
+        "Name": "BASpark",
+        "ServiceTypes": [
+            "KWin/Effect"
+        ]
+    }
+}
