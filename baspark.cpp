@@ -34,7 +34,7 @@ void BasparkEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono::millis
         return;
     }
 
-    int elapsed = m_frameTimer.restart();
+    qint64 elapsed = m_frameTimer.restart();
     if (m_lastPresentTime.count() == 0) elapsed = 16;
     m_lastPresentTime = presentTime;
 
@@ -132,10 +132,10 @@ void BasparkEffect::slotMouseChanged(const QPointF &pos, const QPointF &,
             if (dis(m_rng) < 0.3f) {
                 float a = dis(m_rng) * M_PI * 2.0f;
                 m_sparks.append({
-                    (float)pos.x() + std::cos(a) * 10.0f * m_scale, 
-                    (float)pos.y() + std::sin(a) * 10.0f * m_scale,
+                    static_cast<float>(pos.x()) + std::cos(a) * 10.0f * m_scale,
+                    static_cast<float>(pos.y()) + std::sin(a) * 10.0f * m_scale,
                     std::cos(a) * 1.3f, std::sin(a) * 1.3f,
-                    dis(m_rng) * (float)M_PI * 2.0f, 0.16f, 9.0f * m_scale, 0.95f, 0.7f
+                    dis(m_rng) * static_cast<float>(M_PI) * 2.0f, 0.16f, 9.0f * m_scale, 0.95f, 0.7f
                 });
             }
             m_lastMousePos = pos;
@@ -149,18 +149,18 @@ void BasparkEffect::createBoom(float x, float y)
     std::uniform_real_distribution<float> dis(0, 1);
     Wave w;
     w.x = x; w.y = y;
-    w.ring.ang = dis(m_rng) * M_PI * 2.0f;
+    w.ring.ang = dis(m_rng) * static_cast<float>(M_PI) * 2.0f;
     w.ring.rs = 0.08f;
-    w.ring.segs = {{-0.25f * (float)M_PI, 1.15f * (float)M_PI}, 
-                   {0.00f * (float)M_PI, 1.15f * (float)M_PI}, 
-                   {0.25f * (float)M_PI, 1.15f * (float)M_PI}};
+    w.ring.segs = {{-0.25f * static_cast<float>(M_PI), 1.15f * static_cast<float>(M_PI)},
+                   { 0.00f * static_cast<float>(M_PI), 1.15f * static_cast<float>(M_PI)},
+                   { 0.25f * static_cast<float>(M_PI), 1.15f * static_cast<float>(M_PI)}};
     m_waves.append(w);
 
     for (int i = 0; i < 8; i++) {
-        float a = dis(m_rng) * M_PI * 2.0f;
+        float a = dis(m_rng) * static_cast<float>(M_PI) * 2.0f;
         m_sparks.append({
             x, y, std::cos(a) * (4.8f + dis(m_rng) * 2.0f), std::sin(a) * (4.8f + dis(m_rng) * 2.0f),
-            dis(m_rng) * (float)M_PI * 2.0f, (dis(m_rng) - 0.5f) * 0.28f, 
+            dis(m_rng) * static_cast<float>(M_PI) * 2.0f, (dis(m_rng) - 0.5f) * 0.28f,
             (4.0f + dis(m_rng) * 3.0f) * m_scale, 0.9f, 1.0f
         });
     }
@@ -251,13 +251,20 @@ void BasparkEffect::setupGL(const RenderTarget &renderTarget, const QMatrix4x4 &
     GLShader *sh = ShaderManager::instance()->pushShader(ShaderTrait::UniformColor | ShaderTrait::TransformColorspace);
     sh->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, proj);
     sh->setColorspaceUniforms(ColorDescription::sRGB, renderTarget.colorDescription(), RenderingIntent::Perceptual);
+    GLint blendSrc, blendDst;
+    glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrc);
+    glGetIntegerv(GL_BLEND_DST_RGB, &blendDst);
+    m_savedBlendSrc = blendSrc;
+    m_savedBlendDst = blendDst;
+    m_savedBlend = glIsEnabled(GL_BLEND);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE); // Exact Canvas "lighter"
 }
 
 void BasparkEffect::finalizeGL()
 {
-    glDisable(GL_BLEND);
+    glBlendFunc(m_savedBlendSrc, m_savedBlendDst);
+    if (!m_savedBlend) glDisable(GL_BLEND);
     ShaderManager::instance()->popShader();
 }
 

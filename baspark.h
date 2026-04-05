@@ -35,7 +35,7 @@ struct RingSeg {
 };
 
 struct Wave {
-    float x, y, r;
+    float x, y, r = 0.0f;
     float life = 0;
     float maxLife = 18.0f;
     struct {
@@ -93,6 +93,11 @@ private:
     QElapsedTimer m_frameTimer;
     std::chrono::milliseconds m_lastPresentTime{0};
     std::mt19937 m_rng;
+
+    // Saved GL state (restored after each paint pass)
+    int m_savedBlendSrc = 0;
+    int m_savedBlendDst = 0;
+    bool m_savedBlend = false;
 };
 
 } // namespace KWin
