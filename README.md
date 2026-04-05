@@ -2,6 +2,8 @@
 
 Blue Archive style click animations.
 
+[![Preview](https://img.shields.io/badge/YouTube-Video-red?logo=youtube)](https://youtu.be/RGqpfHJsU2M)
+
 Animation logic ported from [DoomVoss/BASpark](https://github.com/DoomVoss/BASpark).
 
 ## Dependencies
