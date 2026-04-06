@@ -9,7 +9,7 @@
         ],
         "Category": "Accessibility",
         "Description": "Blue Archive style click animation.",
-        "EnabledByDefault": true,
+        "EnabledByDefault": false,
         "Icon": "preferences-desktop-mouse",
         "License": "GPL",
         "Name": "BASpark",
